@@ -50,7 +50,9 @@ void check_cuda(std::string& error_msg)
     {
         std::cout << "│  ├──device number: " << std::to_string(i) << std::endl;
         cudaDeviceProp prop;
-        if(cudaGetDeviceProperties(&prop, i) != cudaSuccess)
+        int memoryClockRate;
+        if(cudaGetDeviceProperties(&prop, i) != cudaSuccess ||
+           cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, i) != cudaSuccess)
         {
             error_msg = "cannot obtain device information. please update Nvidia driver";
             return;
@@ -58,9 +60,9 @@ void check_cuda(std::string& error_msg)
         auto arch = prop.major*10+prop.minor;
         std::cout << "│  ├──arch: " << arch << std::endl;
         std::cout << "│  ├──device name: " << prop.name << std::endl;
-        std::cout << "│  ├──memory clock rate (KHz): " << prop.memoryClockRate << std::endl;
+        std::cout << "│  ├──memory clock rate (KHz): " << memoryClockRate << std::endl;
         std::cout << "│  ├──memory bus width (bits): " << prop.memoryBusWidth << std::endl;
-        std::cout << "│  ├──peak memory bandwidth (GB/s): " << 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6 << std::endl;
+        std::cout << "│  ├──peak memory bandwidth (GB/s): " << 2.0*memoryClockRate*(prop.memoryBusWidth/8)/1.0e6 << std::endl;
 
     }
     has_cuda = true;
